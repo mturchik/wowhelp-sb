@@ -1,12 +1,11 @@
 @page "/fetchdata"
-@using BlazorApp.Shared 
 @inject HttpClient Http
 
 <h1>Weather forecast</h1>
 
 <p>This component demonstrates fetching data from the server.</p>
 
-@if (forecasts == null)
+@if (realms == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -15,38 +14,47 @@ else
     <table class="table">
         <thead>
             <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
+                <th>Index</th>
+                <th>Connected Realm Id</th>
+                <th>Name</th>
+                <th>Locale</th>
+                <th>Timezone</th>
+                <th>Slug</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var forecast in forecasts)
+            @{ var index = 0; }
+            @foreach (var cr in realms)
             {
-                <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
-                </tr>
+                index++;
+                @foreach (var r in cr.Realms)
+                {
+                    <tr>
+                        <td>@index</td>
+                        <td>@cr.Id</td>
+                        <td>@r.Name.US</td>
+                        <td>@r.Locale</td>
+                        <td>@r.Timezone</td>
+                        <td>@r.Slug</td>
+                    </tr>
+                }
             }
         </tbody>
     </table>
 }
 
 @code {
-    private WeatherForecast[] forecasts;
+    private List<ConnectedRealm> realms;
 
     protected override async Task OnInitializedAsync()
     {
-      try
-      {
-        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("/api/WeatherForecast");
-      }
-      catch (Exception ex)
-      {
-        Console.WriteLine(ex.ToString());
-      }
+        try
+        {
+            realms = await Http.GetFromJsonAsync<List<ConnectedRealm>>("/api/BNetRealms");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+        }
     }
 }

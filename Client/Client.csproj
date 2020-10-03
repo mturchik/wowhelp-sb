@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <RazorLangVersion>3.0</RazorLangVersion>
-    <RootNamespace>BlazorApp.Client</RootNamespace>
+    <RootNamespace>WowHelp.Client</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,5 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties properties_4launchsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 
 </Project>

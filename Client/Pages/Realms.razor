@@ -1,9 +1,9 @@
-@page "/fetchdata"
+@page "/realms"
 @inject HttpClient Http
 
-<h1>Weather forecast</h1>
+<h1>All Realm List</h1>
 
-<p>This component demonstrates fetching data from the server.</p>
+<p>This component displays all realms found from the BattleNet API.</p>
 
 @if (realms == null)
 {
@@ -14,7 +14,6 @@ else
     <table class="table">
         <thead>
             <tr>
-                <th>Index</th>
                 <th>Connected Realm Id</th>
                 <th>Name</th>
                 <th>Locale</th>
@@ -23,16 +22,13 @@ else
             </tr>
         </thead>
         <tbody>
-            @{ var index = 0; }
             @foreach (var cr in realms)
             {
-                index++;
                 @foreach (var r in cr.Realms)
                 {
                     <tr>
-                        <td>@index</td>
                         <td>@cr.Id</td>
-                        <td>@r.Name.US</td>
+                        <td>@r.Name</td>
                         <td>@r.Locale</td>
                         <td>@r.Timezone</td>
                         <td>@r.Slug</td>
@@ -50,7 +46,7 @@ else
     {
         try
         {
-            realms = await Http.GetFromJsonAsync<List<ConnectedRealm>>("/api/BNetRealms");
+            realms = await Http.GetFromJsonAsync<List<ConnectedRealm>>("/api/BNRealms");
         }
         catch (Exception ex)
         {

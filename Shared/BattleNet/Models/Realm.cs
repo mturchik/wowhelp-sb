@@ -10,7 +10,7 @@ namespace WowHelp.Shared.BattleNet.Models
         [JsonProperty("connected_realm")]
         public Url ConnectedRealmUrl { get; set; }
 
-        public LocaleArray Name { get; set; }
+        public string Name { get; set; }
 
         public string Locale { get; set; }
 

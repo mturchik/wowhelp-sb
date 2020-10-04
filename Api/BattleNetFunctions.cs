@@ -26,8 +26,8 @@ namespace WowHelp.Api
             _cache = new MemoryCache(new MemoryCacheOptions());
         }
 
-        [FunctionName("BNetRealms")]
-        public static async Task<IActionResult> Run(
+        [FunctionName("BNRealms")]
+        public static async Task<IActionResult> GetRealms(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
             ILogger log)
         {
@@ -40,9 +40,31 @@ namespace WowHelp.Api
                 log.LogError("Unable to look up battle net connected realms!");
                 return new NotFoundResult();
             }
+
             _cache.Set("BN_CR_INDEX", realms, TimeSpan.FromHours(1));
 
             return new OkObjectResult(realms);
+        }
+
+        [FunctionName("BNRecipes")]
+        public static async Task<IActionResult> GetRecipeClasses(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
+            ILogger log)
+        {
+            var recipeClasses = _cache.Get<List<ItemSubClass>>("BN_RECIPE_TYPES");
+            if (recipeClasses != null) return new OkObjectResult(recipeClasses);
+
+            var itemClass = await _bNetService.GetRecipeItemClass();
+            if (itemClass is null || itemClass.ItemSubClasses is null || !itemClass.ItemSubClasses.Any())
+            {
+                log.LogError("Unable to look up recipe types!");
+                return new NotFoundResult();
+            }
+
+            recipeClasses = itemClass.ItemSubClasses;
+            _cache.Set("BN_RECIPE_TYPES", recipeClasses, TimeSpan.FromHours(1));
+
+            return new OkObjectResult(recipeClasses);
         }
     }
 }

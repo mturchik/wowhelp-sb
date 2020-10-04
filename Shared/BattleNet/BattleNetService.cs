@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -45,7 +46,7 @@ namespace WowHelp.Shared.BattleNet
 
         private HttpRequestMessage CreateAuthRequest()
         {
-            var authRequest = new HttpRequestMessage(HttpMethod.Post, StaticRequestUrl.AuthUrl);
+            var authRequest = new HttpRequestMessage(HttpMethod.Post, StaticRequestUrl.Auth);
 
             var byteArray = new UTF8Encoding().GetBytes(_authKey);
             authRequest.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
@@ -60,27 +61,38 @@ namespace WowHelp.Shared.BattleNet
             return authRequest;
         }
 
+        private void EnsureLocaleSet(ref string url)
+        {
+            if (url.Contains("locale=")) return;
+
+            if (url.Contains("?"))
+                url += "&locale=en_US";
+            else
+                url += "?locale=en_US";
+        }
+
         #endregion Utility
 
-        public async Task<T> GetByUrl<T>(Url url)
+        public async Task<T> GetByUrl<T>(string url)
         {
-            var response = await _httpClient.Get<T>(url.Href);
+            await SetAuthorizeToken();
+            EnsureLocaleSet(ref url);
+
+            var response = await _httpClient.Get<T>(url);
 
             return response;
         }
 
         public async Task<List<ConnectedRealm>> GetRealms()
         {
-            await SetAuthorizeToken();
-
-            var index = await _httpClient.Get<CrIndexResponse>(StaticRequestUrl.CrIndexUrl);
+            var index = await GetByUrl<CrIndexResponse>(StaticRequestUrl.CrIndex);
             if (index is null) return new List<ConnectedRealm>();
 
             var realms = new List<ConnectedRealm>();
 
             foreach (var url in index.ConnectedRealmUrls)
             {
-                var realm = await GetByUrl<ConnectedRealm>(url);
+                var realm = await GetByUrl<ConnectedRealm>(url.Href);
 
                 if (realm is null) continue;
 
@@ -90,5 +102,7 @@ namespace WowHelp.Shared.BattleNet
             return realms;
         }
 
+        public async Task<ItemClassResponse> GetRecipeItemClass() => 
+            await GetByUrl<ItemClassResponse>(StaticRequestUrl.RecipeType);
     }
 }

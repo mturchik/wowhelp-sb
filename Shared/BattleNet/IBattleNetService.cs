@@ -6,7 +6,8 @@ namespace WowHelp.Shared.BattleNet
 {
     public interface IBattleNetService
     {
-        Task<T> GetByUrl<T>(Url url);
+        Task<T> GetByUrl<T>(string url);
         Task<List<ConnectedRealm>> GetRealms();
+        Task<ItemClassResponse> GetRecipeItemClass();
     }
 }

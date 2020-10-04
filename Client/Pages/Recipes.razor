@@ -1,0 +1,46 @@
+﻿@page "/recipes"
+@inject HttpClient Http
+
+@if (recipeClasses is null)
+{
+    <h2>Loading...</h2>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var type in recipeClasses)
+            {
+                <tr>
+                    <td>@type.Id</td>
+                    <td>@type.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<ItemSubClass> recipeClasses;
+
+    private RecipeSearch searchForm = new RecipeSearch();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            recipeClasses = await Http.GetFromJsonAsync<List<ItemSubClass>>("/api/BNRecipes");
+            Console.WriteLine(JsonConvert.SerializeObject(recipeClasses));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+        }
+    }
+}
